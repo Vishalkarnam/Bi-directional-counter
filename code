@@ -1,0 +1,43 @@
+#define sensorA 2  // IR Sensor A connected to digital pin 2
+#define sensorB 3  // IR Sensor B connected to digital pin 3
+
+int count = 0;     // Object counter
+bool A_state = false;
+bool B_state = false;
+
+void setup() {
+  pinMode(sensorA, INPUT);
+  pinMode(sensorB, INPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  int A = digitalRead(sensorA);
+  int B = digitalRead(sensorB);
+
+  // If an object crosses Sensor A first, then Sensor B → Increment count (Incoming)
+  if (A == HIGH && B_state == false) {
+    A_state = true;
+  }
+  if (A_state && B == HIGH) {
+    count++;
+    A_state = false;
+    B_state = true;
+    Serial.print("Incoming Object | Count: ");
+    Serial.println(count);
+    delay(300);  // Debounce delay
+  }
+
+  // If an object crosses Sensor B first, then Sensor A → Decrement count (Outgoing)
+  if (B == HIGH && A_state == false) {
+    B_state = true;
+  }
+  if (B_state && A == HIGH) {
+    count--;
+    B_state = false;
+    A_state = true;
+    Serial.print("Outgoing Object | Count: ");
+    Serial.println(count);
+    delay(300);  // Debounce delay
+  }
+}
